@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>📖 Staff Logbook</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #f9e0ae, #fbc2eb, #a6c1ee);
+            background-size: 400% 400%;
+            animation: bgMove 15s ease infinite;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            animation: fadeDown 1s ease;
+            text-shadow: 2px 2px 5px rgba(0,0,0,0.15);
+        }
+
+        /* Book page container */
+        .book {
+            width: 90%;
+            max-width: 1000px;
+            perspective: 2000px;
+        }
+
+        .page {
+            background: #fff;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            transform-origin: left center;
+            animation: flipIn 1.2s ease;
+        }
+
+        form, .search-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 12px;
+        }
+
+        input, textarea, select {
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        textarea {
+            grid-column: span 2;
+            resize: none;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            border-color: #ff6b6b;
+            box-shadow: 0 0 10px rgba(255,107,107,0.4);
+            transform: scale(1.03);
+        }
+
+        button {
+            padding: 10px 15px;
+            border: none;
+            cursor: pointer;
+            border-radius: 10px;
+            font-size: 14px;
+            background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+            color: #333;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            transition: all 0.4s ease;
+        }
+
+        button:hover {
+            transform: rotateY(15deg) scale(1.1);
+            box-shadow: 0 8px 18px rgba(0,0,0,0.3);
+        }
+
+        button.search-btn { background: linear-gradient(135deg, #89f7fe, #66a6ff); }
+        button.clear-btn { background: linear-gradient(135deg, #f5576c, #f093fb); }
+        button.show-btn { background: linear-gradient(135deg, #43e97b, #38f9d7); }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-top: 10px;
+            animation: fadeUp 1s ease;
+        }
+
+        table, th, td { border: 1px solid #ddd; }
+        th, td { padding: 12px; font-size: 14px; text-align: left; }
+        th { background: #ff6b6b; color: white; }
+        tr:nth-child(even) { background: #fdfdfd; }
+
+        tr {
+            animation: slideIn 0.6s ease;
+            transition: transform 0.3s, background 0.3s;
+        }
+
+        tr:hover {
+            background: #fff3e0;
+            transform: scale(1.02) rotateY(3deg);
+        }
+
+        /* Animations */
+        @keyframes bgMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes fadeDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-40px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes flipIn {
+            from { opacity: 0; transform: rotateY(-90deg); }
+            to { opacity: 1; transform: rotateY(0deg); }
+        }
+    </style>
+</head>
+<body>
+<h1>📖 Staff Logbook</h1>
+
+<div class="book">
+    <!-- Form Page -->
+    <div class="page">
+        <form id="logForm">
+            <input type="text" id="staffName" placeholder="Staff Name" required>
+            <input type="text" id="staffID" placeholder="Staff ID" required>
+            <input type="text" id="subCode" placeholder="Subject Code" required>
+            <input type="text" id="subject" placeholder="Subject" required>
+            <input type="number" id="year" placeholder="Year" required>
+            <input type="number" id="semester" placeholder="Semester" required>
+            <input type="text" id="department" placeholder="Department" required>
+            <select id="section" required>
+                <option value="">Select Section</option>
+                <option value="A">A</option>
+                <option value="B">B</option>
+                <option value="C">C</option>
+                <option value="D">D</option>
+            </select>
+            <textarea id="logMessage" placeholder="Log Message" required></textarea>
+            <button type="submit">➕ Add Log</button>
+            <button type="button" class="clear-btn" onclick="clearLogs()">🗑 Clear All</button>
+        </form>
+    </div>
+
+    <!-- Search Page -->
+    <div class="page">
+        <div class="search-container">
+            <input type="text" id="searchSubject" placeholder="Enter Subject to Search">
+            <select id="searchSection">
+                <option value="">All Sections</option>
+                <option value="A">Section A</option>
+                <option value="B">Section B</option>
+                <option value="C">Section C</option>
+                <option value="D">Section D</option>
+            </select>
+            <button class="search-btn" onclick="searchLogs()">🔍 Search</button>
+            <button class="show-btn" onclick="displayLogs()">📑 Show All</button>
+        </div>
+    </div>
+
+    <!-- Table Page -->
+    <div class="page">
+        <table id="logTable">
+            <thead>
+                <tr>
+                    <th>Staff Name</th>
+                    <th>Staff ID</th>
+                    <th>Sub Code</th>
+                    <th>Subject</th>
+                    <th>Year</th>
+                    <th>Semester</th>
+                    <th>Department</th>
+                    <th>Section</th>
+                    <th>Log Message</th>
+                    <th>Timestamp</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+const logForm = document.getElementById('logForm');
+const logTable = document.getElementById('logTable').getElementsByTagName('tbody')[0];
+let logs = JSON.parse(localStorage.getItem('staffLogs')) || [];
+displayLogs();
+
+// Add new log
+logForm.addEventListener('submit', function(e){
+    e.preventDefault();
+    const log = {
+        staffName: document.getElementById('staffName').value,
+        staffID: document.getElementById('staffID').value,
+        subCode: document.getElementById('subCode').value,
+        subject: document.getElementById('subject').value,
+        year: document.getElementById('year').value,
+        semester: document.getElementById('semester').value,
+        department: document.getElementById('department').value,
+        section: document.getElementById('section').value,
+        logMessage: document.getElementById('logMessage').value,
+        timestamp: new Date().toLocaleString()
+    };
+    logs.push(log);
+    localStorage.setItem('staffLogs', JSON.stringify(logs));
+    displayLogs();
+    logForm.reset();
+});
+
+// Display logs
+function displayLogs(filteredLogs){
+    logTable.innerHTML = '';
+    const data = filteredLogs || logs;
+    data.forEach(log => {
+        const row = logTable.insertRow();
+        row.insertCell(0).innerText = log.staffName;
+        row.insertCell(1).innerText = log.staffID;
+        row.insertCell(2).innerText = log.subCode;
+        row.insertCell(3).innerText = log.subject;
+        row.insertCell(4).innerText = log.year;
+        row.insertCell(5).innerText = log.semester;
+        row.insertCell(6).innerText = log.department;
+        row.insertCell(7).innerText = log.section;
+        row.insertCell(8).innerText = log.logMessage;
+        row.insertCell(9).innerText = log.timestamp;
+    });
+}
+
+// Clear all logs
+function clearLogs(){
+    if(confirm('Are you sure you want to clear all logs?')){
+        logs = [];
+        localStorage.removeItem('staffLogs');
+        displayLogs();
+    }
+}
+
+// Search logs by subject and section
+function searchLogs(){
+    const subject = document.getElementById('searchSubject').value.trim().toLowerCase();
+    const section = document.getElementById('searchSection').value;
+    const filteredLogs = logs.filter(log => {
+        const subjectMatch = subject === '' || log.subject.toLowerCase().includes(subject);
+        const sectionMatch = section === '' || log.section === section;
+        return subjectMatch && sectionMatch;
+    });
+    displayLogs(filteredLogs);
+}
+</script>
+</body>
+</html>
